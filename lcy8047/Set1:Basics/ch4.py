@@ -8,69 +8,38 @@ def calc_frequency(s: bytes) -> int:
             if( 0x20 <= c and c <= 0x7e ):
                 res += 1
             idx = chr(c).upper()
-            #print(idx)
             res += f1[idx]
         except:
             continue
     
     return res
 
+def padded_hex(n: int, padding_size: int) -> str:
+    hex_string = "0x"
+    if padding_size - len(hex(n)[2:]) > 0:
+        hex_string += "0"*( padding_size-len(hex(n)[2:]) )
+    return hex_string+hex(n)[2:]
+
 input_file = open("./file", 'r')
-#while True:
-for i in range(1):
+
+score = 0
+highest_score_str = ""
+while True:
     b = input_file.readline()
     if not b: break
     s = bytes(bytearray.fromhex(b))
-    print(len(s))
-    #print(s, " : ", calc_frequency(s))
-
-    score = 0
-    highest_score_str = ""
-    for j in range(2):
-        res = b""
-        for i,c in enumerate(s):
-            print(i, c^j, bytes(chr(c^j), 'utf-8'))
-            res += bytes(chr(c^j), 'utf-8')
-        print(res , len(res))
-        for i,c in enumerate(res):
-            print(i, chr(c))
-        cur_score = calc_frequency(res)
-        if cur_score > score:
-            score = cur_score
-            highest_score_str = res
-        #print( len(res) )
-        #print(res)
-len(highest_score_str)
-print(highest_score_str, score)
-'''
-input_file = open("./file", 'r')
-s = b""
-
-while True:
-    s = input_file.readline()
-    print( s , end=" : ")
-    if not s: break
-    s = str(bytearray.fromhex(s))
-    #print(bytes(s))
-
-    score = 0
-    highest_score_str = ""
-
+    
     for j in range(0xff):
-        #print("j : ",j)
         res = ""
-        try:
-            for i,c in enumerate(s):
-                res += hex((ord(c)^j))[2:]
-            b = bytearray.fromhex(res)
-            res = b.decode()
-            
-        except:
-            continue
+        for i,c in enumerate(s):
+            #print(i, c^j, padded_hex(c^j,2))
+            res += padded_hex(c^j, 2)[2:]
+        res = bytes(bytearray.fromhex(res))
         cur_score = calc_frequency(res)
         if cur_score > score:
             score = cur_score
             highest_score_str = res
-        print(res)
-'''
+
+print(highest_score_str, score, "len =", len(highest_score_str))
+
 input_file.close()
